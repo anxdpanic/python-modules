@@ -37,11 +37,20 @@
         '<Command Name>': {                             # - name of the command
             'arguments': ['--arg1', '-a'],              # - list of arguments to execute command
             'help': 'Help text is helpful',             # - help text
-            'commands': [                               # - list of commands to be executed
-                ['sudo mkdir /tmp/test/', False],       # - command is a list where the first item
-                ['sudo mkdir /tmp/test/cmd/', True],    # is the command, and the second item is
-            ]                                           # whether the command should require a
-        },                                              # successful result as a boolean value
+            'commands': [                               # - list of commands(dict) to be executed
+                {
+                    'command': 'sudo mkdir /tmp/test/', # - the command to be executed
+                    'shell': False,                     # - use shell’s own pipeline support
+                    'require_success': False            # - require the command to successfully
+                },                                      #   execute
+                {
+                    'command': 'sudo touch /tmp/test/test',
+                    'shell': False,
+                    'require_success': True
+                },
+                ...
+            ]
+        },
         ...
     }
 
@@ -56,44 +65,76 @@ COMMANDS = {
         'arguments': ['--start', '-s'],
         'help': 'Start Kodi',
         'commands': [
-            ['sudo tvservice -p', False],
-            ['sudo systemctl start mediacenter', False]
+            {
+                'command': 'sudo tvservice -p',
+                'shell': False,
+                'require_success': False
+            },
+            {
+                'command': 'sudo systemctl start mediacenter',
+                'shell': False,
+                'require_success': False
+            },
         ]
     },
     'stop_kodi': {
         'arguments': ['--stop', '-x'],
         'help': 'Stop Kodi',
         'commands': [
-            ['sudo systemctl stop mediacenter', False]
+            {
+                'command': 'sudo systemctl stop mediacenter',
+                'shell': False,
+                'require_success': False
+            },
         ]
     },
     'restart_kodi': {
         'arguments': ['--restart', '-r'],
         'help': 'Restart Kodi',
         'commands': [
-            ['sudo tvservice -p', False],
-            ['sudo systemctl restart mediacenter', False]
+            {
+                'command': 'sudo tvservice -p',
+                'shell': False,
+                'require_success': False
+            },
+            {
+                'command': 'sudo systemctl restart mediacenter',
+                'shell': False,
+                'require_success': False
+            },
         ]
     },
     'tail_kodi': {
         'arguments': ['--tail', '-l'],
         'help': 'Tail the Kodi log',
         'commands': [
-            ['sudo tail -f /home/osmc/.kodi/temp/kodi.log', False]
+            {
+                'command': 'sudo tail -f /home/osmc/.kodi/temp/kodi.log',
+                'shell': False,
+                'require_success': False
+            },
         ]
     },
     'hdmi': {
         'arguments': ['--hdmi', '-t'],
         'help': 'Power on HDMI with preferred settings',
         'commands': [
-            ['sudo tvservice -p', False]
+            {
+                'command': 'sudo tvservice -p',
+                'shell': False,
+                'require_success': False
+            },
         ]
     },
     'reboot_device': {
         'arguments': ['--reboot', '-v'],
         'help': 'Reboot the device',
         'commands': [
-            ['sudo reboot now', False]
+            {
+                'command': 'sudo reboot now',
+                'shell': False,
+                'require_success': False
+            },
         ]
     },
 }
@@ -118,7 +159,11 @@ class Executor:
             return False
 
         command_commands = command_descriptor.get('commands')
-        if not all(isinstance(element, list) and len(element) == 2 for element in command_commands):
+        if not all(isinstance(element, dict) and
+                   isinstance(element.get('command'), str) and
+                   isinstance(element.get('shell'), bool) and
+                   isinstance(element.get('require_success'), bool)
+                   for element in command_commands):
             print('Command %s has an invalid command' % command_name)
             return False
 
@@ -134,11 +179,13 @@ class Executor:
 
     @staticmethod
     def _execute(commands):
-        for command, require_success in commands:
-            command = command.split(' ')
+        for cmd in commands:
+            command = cmd.get('command').split(' ')
+            shell = bool(cmd.get('shell'))
+            require_success = bool(cmd.get('require_success'))
 
             try:
-                _ = subprocess.check_call(command)
+                _ = subprocess.check_call(command, shell=shell)
             except:
                 traceback.print_exc()
                 if require_success:
