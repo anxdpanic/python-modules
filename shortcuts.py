@@ -40,12 +40,12 @@
             'commands': [                               # - list of commands(dict) to be executed
                 {
                     'command': 'sudo mkdir /tmp/test/', # - the command to be executed
-                    'shell': False,                     # - use shell’s own pipeline support
+                    'shell': True,                      # - use shell’s own pipeline support
                     'require_success': False            # - require the command to successfully
                 },                                      #   execute
                 {
                     'command': 'sudo touch /tmp/test/test',
-                    'shell': False,
+                    'shell': True,
                     'require_success': True
                 },
                 ...
@@ -67,12 +67,12 @@ COMMANDS = {
         'commands': [
             {
                 'command': 'sudo tvservice -p',
-                'shell': False,
+                'shell': True,
                 'require_success': False
             },
             {
                 'command': 'sudo systemctl start mediacenter',
-                'shell': False,
+                'shell': True,
                 'require_success': False
             },
         ]
@@ -83,7 +83,7 @@ COMMANDS = {
         'commands': [
             {
                 'command': 'sudo systemctl stop mediacenter',
-                'shell': False,
+                'shell': True,
                 'require_success': False
             },
         ]
@@ -94,12 +94,12 @@ COMMANDS = {
         'commands': [
             {
                 'command': 'sudo tvservice -p',
-                'shell': False,
+                'shell': True,
                 'require_success': False
             },
             {
                 'command': 'sudo systemctl restart mediacenter',
-                'shell': False,
+                'shell': True,
                 'require_success': False
             },
         ]
@@ -110,7 +110,7 @@ COMMANDS = {
         'commands': [
             {
                 'command': 'sudo tail -f /home/osmc/.kodi/temp/kodi.log',
-                'shell': False,
+                'shell': True,
                 'require_success': False
             },
         ]
@@ -121,7 +121,7 @@ COMMANDS = {
         'commands': [
             {
                 'command': 'sudo tvservice -p',
-                'shell': False,
+                'shell': True,
                 'require_success': False
             },
         ]
@@ -132,7 +132,7 @@ COMMANDS = {
         'commands': [
             {
                 'command': 'sudo reboot now',
-                'shell': False,
+                'shell': True,
                 'require_success': False
             },
         ]
@@ -180,7 +180,7 @@ class Executor:
     @staticmethod
     def _execute(commands):
         for cmd in commands:
-            command = cmd.get('command').split(' ')
+            command = cmd.get('command')
             shell = bool(cmd.get('shell'))
             require_success = bool(cmd.get('require_success'))
 
