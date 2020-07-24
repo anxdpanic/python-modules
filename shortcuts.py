@@ -27,6 +27,9 @@
 
     For more information, please refer to <http://unlicense.org/>
 
+
+    Original Source: https://github.com/anxdpanic/python-modules/
+
     Usage:
         - Make a copy of this file with whatever name you'd like
         - Edit the COMMANDS variable below
