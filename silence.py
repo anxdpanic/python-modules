@@ -1,3 +1,28 @@
+"""
+    Mute replacement
+        - Set volume to 1 instead Muting (no onscreen 'Muted' indicator)
+        - Saves volume before setting volume to 1
+        - On consecutive run volume will be reset to saved volume
+
+    Place this file in the Kodi userdata folder (https://kodi.wiki/view/Userdata#Location)
+    Create a key bind in Kodi to run this script (https://kodi.wiki/view/Keymap)
+
+    - Keymap action: RunScript("special://userdata/silence.py")
+    - example keymap:
+        '''
+        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        <keymap>
+            <global>
+                <keyboard>
+                    <f1 mod="ctrl,alt">RunScript("special://userdata/silence.py")</f1>
+                </keyboard>
+            </global>
+        </keymap>
+        '''
+
+"""
+
+
 import json
 
 import xbmc
